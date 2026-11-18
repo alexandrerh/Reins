@@ -53,6 +53,9 @@ namespace Reins
 
             Label("R E I N S", 0, 60, width, 170, 150, Cream);
             Label("The night mail, one horse, two strips of leather.", 0, 230, width, 50, 34, Brass, FontStyle.Italic);
+            if (Game.HasBest)
+                Label("Best run:  " + Game.BestLetters + " letters in " + Clock(Game.BestTime), 0, 282, width, 40, 24,
+                    Cream, FontStyle.Normal);
 
             float cx = width * 0.5f;
             Key("A", cx - 420, H - 205);
@@ -171,17 +174,26 @@ namespace Reins
             Label(head, 0, 250, width, 140, 110, cream);
             Label(sub, 0, 400, width, 50, 34, new Color(Brass.r, Brass.g, Brass.b, a), FontStyle.Italic);
 
-            int mins = (int)(Game.RunTime / 60f);
-            float secs = Game.RunTime - mins * 60;
-            string time = mins + ":" + secs.ToString("00.0");
             float cx = width * 0.5f;
             Stat("LETTERS", Game.Letters + " / " + Game.LettersTotal, cx - 400, a);
-            Stat("TIME", time, cx - 110, a);
+            Stat("TIME", Clock(Game.RunTime), cx - 110, a);
+
+            if (Game.NewBest)
+                Label("NEW BEST RUN", 0, 680, width, 50, 34, new Color(Brass.r, Brass.g, Brass.b, a));
+            else if (Game.HasBest)
+                Label("Best run:  " + Game.BestLetters + " letters in " + Clock(Game.BestTime), 0, 680, width, 40, 24,
+                    new Color(1, 1, 1, 0.6f * a), FontStyle.Normal);
             Stat("DISTANCE", Mathf.RoundToInt(Mathf.Clamp(Game.Distance, 0, Track.Length)) + " m", cx + 180, a);
 
             float pulse = 0.6f + 0.4f * Mathf.Sin(Time.time * 3.5f);
             Label("SPACE  to ride again        ESC  for the title", 0, H - 200, width, 50, 30,
                 new Color(Cream.r, Cream.g, Cream.b, pulse * a));
+        }
+
+        static string Clock(float seconds)
+        {
+            int mins = (int)(seconds / 60f);
+            return mins + ":" + (seconds - mins * 60).ToString("00.0");
         }
 
         string Rank()

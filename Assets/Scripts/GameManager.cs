@@ -162,8 +162,33 @@ namespace Reins
             Current = how;
             StateTime = 0f;
             Distance = Rig.Pos.z;
-            if (how == State.Delivered) sfx.Horn();
+            if (how == State.Delivered)
+            {
+                sfx.Horn();
+                SaveBest();
+            }
             else sfx.Crash();
+        }
+
+        // ---------------------------------------------------------------- best run
+
+        /// <summary>Capture runs keep their own record so the autopilot never sets the player's par.</summary>
+        string BestKey => shotDir != null ? "capture" : "best";
+
+        public bool NewBest { get; private set; }
+        public bool HasBest => PlayerPrefs.HasKey(BestKey + ".letters");
+        public int BestLetters => PlayerPrefs.GetInt(BestKey + ".letters", 0);
+        public float BestTime => PlayerPrefs.GetFloat(BestKey + ".time", 0f);
+
+        /// <summary>More letters wins; the clock only breaks ties.</summary>
+        void SaveBest()
+        {
+            bool better = !HasBest || Letters > BestLetters || (Letters == BestLetters && RunTime < BestTime);
+            if (!better) return;
+            PlayerPrefs.SetInt(BestKey + ".letters", Letters);
+            PlayerPrefs.SetFloat(BestKey + ".time", RunTime);
+            PlayerPrefs.Save();
+            NewBest = true;
         }
 
         void Restart(bool straightIn)
