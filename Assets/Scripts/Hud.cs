@@ -177,7 +177,7 @@ namespace Reins
             float cx = width * 0.5f;
             Stat("LETTERS", Game.Letters + " / " + Game.LettersTotal, cx - 400, a);
             Stat("TIME", time, cx - 110, a);
-            Stat("DISTANCE", Mathf.RoundToInt(Mathf.Clamp(Game.Rig.Pos.z, 0, Track.Length)) + " m", cx + 180, a);
+            Stat("DISTANCE", Mathf.RoundToInt(Mathf.Clamp(Game.Distance, 0, Track.Length)) + " m", cx + 180, a);
 
             float pulse = 0.6f + 0.4f * Mathf.Sin(Time.time * 3.5f);
             Label("SPACE  to ride again        ESC  for the title", 0, H - 200, width, 50, 30,

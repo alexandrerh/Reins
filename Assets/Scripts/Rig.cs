@@ -15,9 +15,9 @@ namespace Reins
     {
         public const float MaxSpeed = 21f;
         public const float WalkSpeed = 4.5f;
-        public const float TurnRate = 48f;          // deg/s at full single-rein pull
+        public const float TurnRate = 36f;          // deg/s at full single-rein pull
         public const float CoachGap = 4.3f;         // horse to coach axle
-        public const float FallMargin = 1.7f;       // how far past the edge before she goes over
+        public const float FallMargin = 2.1f;       // how far past the edge before she goes over
         public const int StartingWheels = 3;
 
         public Track Track;
@@ -59,7 +59,7 @@ namespace Reins
         LineRenderer lineL, lineR;
         Material lineMatL, lineMatR;
 
-        static readonly Color Leather = new Color(0.55f, 0.36f, 0.20f);
+        static readonly Color Leather = new Color(0.90f, 0.68f, 0.38f);
         static readonly Color Hot = new Color(1f, 0.22f, 0.12f);
 
         public Vector3 Forward => Dir(Heading);
@@ -113,6 +113,9 @@ namespace Reins
             Heading += steer * TurnRate * Mathf.Lerp(1f, 0.8f, s01) * dt;
             Heading += Mathf.DeltaAngle(Heading, roadAngle) * follow * dt;
             Heading += wander * 9f * (0.5f + s01) * dt;
+            // She will not willingly leave the road: on the verge she edges back in
+            // unless the driver is hauling her the other way.
+            if (OnVerge) Heading -= Mathf.Sign(Lateral) * 24f * dt;
             Heading = roadAngle + Mathf.Clamp(Mathf.DeltaAngle(roadAngle, Heading), -55f, 55f);
 
             // Speed: slack reins let her run, both reins rein her in.
@@ -204,6 +207,7 @@ namespace Reins
         void TickFall(float dt)
         {
             fallTime += dt;
+            if (fallTime > 3f) return; // long gone into the fog
             fallVelocity += Vector3.down * 16f * dt;
             Pos += fallVelocity * dt;
             CoachPos += (fallVelocity + Vector3.down * 2f) * dt * 0.9f;
@@ -301,7 +305,7 @@ namespace Reins
             float hot = Mathf.InverseLerp(0.35f, 1f, rein.Strain);
             float flicker = rein.Strain > 0.8f ? 0.5f + 0.5f * Mathf.Sin(Time.time * 30f) : 1f;
             mat.color = Color.Lerp(Leather, Hot, hot * flicker);
-            line.widthMultiplier = Mathf.Lerp(0.05f, 0.075f, rein.Pull);
+            line.widthMultiplier = Mathf.Lerp(0.09f, 0.14f, rein.Pull);
         }
 
         // ---------------------------------------------------------------- construction
@@ -314,6 +318,7 @@ namespace Reins
             Color tack = new Color(0.16f, 0.11f, 0.09f);
 
             horse = Build.Empty("Horse", transform, Vector3.zero);
+            horse.localScale = Vector3.one * 1.15f; // a coach horse, not a pony
             horseBody = Build.Empty("Body", horse, Vector3.zero);
 
             Build.Box(horseBody, new Vector3(0, 1.45f, 0), new Vector3(0.72f, 0.82f, 2.0f), coat);
@@ -467,7 +472,7 @@ namespace Reins
             line.sharedMaterial = mat;
             line.positionCount = 12;
             line.useWorldSpace = true;
-            line.widthMultiplier = 0.05f;
+            line.widthMultiplier = 0.09f;
             line.numCapVertices = 2;
             line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             return line;

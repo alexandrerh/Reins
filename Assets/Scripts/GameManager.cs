@@ -24,6 +24,7 @@ namespace Reins
         public int Letters { get; private set; }
         public int LettersTotal => Track.Pickups.Count;
         public float RunTime { get; private set; }
+        public float Distance { get; private set; }   // how far the run got, frozen when it ends
         public float StateTime { get; private set; }
         public string Toast { get; private set; }
         public float ToastTime { get; private set; }
@@ -160,6 +161,7 @@ namespace Reins
             if (Current != State.Playing) return;
             Current = how;
             StateTime = 0f;
+            Distance = Rig.Pos.z;
             if (how == State.Delivered) sfx.Horn();
             else sfx.Crash();
         }
