@@ -2,6 +2,8 @@
 
 **The night mail, one horse, two strips of leather.**
 
+![Reins cover art](Docs/cover.png)
+
 Reins is a short arcade driving game about not really being in control. You are the driver of a
 mail coach on a mountain ridge at dusk. You cannot steer and you have no brake. You have a left
 rein and a right rein, a horse with her own ideas, and 1.4 km of road between you and the town of
@@ -127,6 +129,9 @@ The stagecoach was generated in [Tripo](https://www.tripo3d.ai/) from a text pro
 through `Tools/prepare_model.py` in Blender, which welds and decimates it from roughly 1.9 million
 triangles to 18 thousand, normalises scale and origin, and writes it out with a 1k albedo map.
 Everything else in the game is built from primitives and generated meshes in code.
+
+The cover illustration at the top of this page was generated with ChatGPT's image model. The other
+images are unedited captures from the game.
 
 Development was AI-assisted (Claude Code).
 
