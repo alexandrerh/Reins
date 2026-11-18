@@ -54,6 +54,12 @@ namespace Reins
             return m;
         }
 
+        /// <summary>Lit material with an albedo map, for imported models.</summary>
+        public static Material Textured(Texture texture, Color tint)
+        {
+            return new Material(litShader) { color = tint, mainTexture = texture };
+        }
+
         public static Transform Empty(string name, Transform parent, Vector3 localPos)
         {
             var go = new GameObject(name);

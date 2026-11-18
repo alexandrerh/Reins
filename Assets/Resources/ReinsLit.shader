@@ -6,6 +6,7 @@ Shader "Reins/Lit"
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)
+        _MainTex ("Albedo", 2D) = "white" {}
         _Emission ("Emission", Color) = (0,0,0,0)
     }
     SubShader
@@ -26,6 +27,7 @@ Shader "Reins/Lit"
             #include "AutoLight.cginc"
 
             fixed4 _Color;
+            sampler2D _MainTex;
             fixed4 _Emission;
             float4 _LanternPos;    // xyz = world position, w = radius
             fixed4 _LanternColor;
@@ -35,6 +37,7 @@ Shader "Reins/Lit"
                 float4 vertex : POSITION;
                 float3 normal : NORMAL;
                 fixed4 color : COLOR;
+                float2 uv : TEXCOORD0;
             };
 
             struct v2f
@@ -44,6 +47,7 @@ Shader "Reins/Lit"
                 float3 worldPos : TEXCOORD1;
                 SHADOW_COORDS(2)
                 UNITY_FOG_COORDS(3)
+                float2 uv : TEXCOORD4;
                 fixed4 color : COLOR;
             };
 
@@ -54,6 +58,7 @@ Shader "Reins/Lit"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 o.color = v.color;
+                o.uv = v.uv;
                 TRANSFER_SHADOW(o)
                 UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
@@ -62,7 +67,7 @@ Shader "Reins/Lit"
             fixed4 frag (v2f i) : SV_Target
             {
                 float3 n = normalize(i.worldNormal);
-                fixed3 albedo = _Color.rgb * i.color.rgb;
+                fixed3 albedo = _Color.rgb * i.color.rgb * tex2D(_MainTex, i.uv).rgb;
 
                 float ndl = saturate(dot(n, _WorldSpaceLightPos0.xyz));
                 fixed shadow = SHADOW_ATTENUATION(i);

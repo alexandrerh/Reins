@@ -363,6 +363,15 @@ namespace Reins
             coach = Build.Empty("Coach", transform, Vector3.zero);
             cabin = Build.Empty("Cabin", coach, Vector3.zero);
 
+            // Prefer the modelled coach when it is in the project; the blockout below is the fallback.
+            var model = Resources.Load<Mesh>("Models/Coach");
+            var albedo = Resources.Load<Texture2D>("Models/CoachAlbedo");
+            if (model != null && albedo != null)
+            {
+                BuildModelCoach(model, albedo, coatCol, skin, black, wood);
+                return;
+            }
+
             Build.Box(cabin, new Vector3(0, 1.5f, -0.1f), new Vector3(1.55f, 1.35f, 2.1f), body);
             Build.Box(cabin, new Vector3(0, 0.95f, -0.1f), new Vector3(1.62f, 0.14f, 2.2f), trim);
             Build.Box(cabin, new Vector3(0, 2.22f, -0.1f), new Vector3(1.75f, 0.12f, 2.35f), black);
@@ -409,6 +418,38 @@ namespace Reins
                 Build.Box(wheels[i], Vector3.zero, new Vector3(0.13f, 0.1f, r * 1.85f), trim);
             }
         }
+
+        /// <summary>The generated stagecoach mesh, with the driver, lantern light and shafts added on.</summary>
+        void BuildModelCoach(Mesh model, Texture2D albedo, Color coatCol, Color skin, Color black, Color wood)
+        {
+            Build.MeshObject(model, cabin, Vector3.zero, Vector3.one, Build.Textured(albedo, Color.white * 1.15f),
+                new Vector3(0f, ModelYaw, 0f));
+
+            // Driver on the box seat.
+            Vector3 seat = DriverSeat;
+            Build.Box(cabin, seat + new Vector3(0, 0.45f, 0), new Vector3(0.55f, 0.9f, 0.4f), coatCol);
+            Build.Sphere(cabin, seat + new Vector3(0, 1.1f, 0.02f), Vector3.one * 0.36f, skin);
+            Build.Cylinder(cabin, seat + new Vector3(0, 1.28f, 0.02f), new Vector3(0.6f, 0.02f, 0.6f), black);
+            Build.Cylinder(cabin, seat + new Vector3(0, 1.4f, 0.02f), new Vector3(0.36f, 0.12f, 0.36f), black);
+            Build.Box(cabin, seat + new Vector3(-0.3f, 0.5f, 0.3f), new Vector3(0.14f, 0.14f, 0.6f), coatCol, new Vector3(20f, 0, 0));
+            Build.Box(cabin, seat + new Vector3(0.3f, 0.5f, 0.3f), new Vector3(0.14f, 0.14f, 0.6f), coatCol, new Vector3(20f, 0, 0));
+            handL = Build.Empty("HandL", cabin, seat + new Vector3(-0.3f, 0.4f, 0.62f));
+            handR = Build.Empty("HandR", cabin, seat + new Vector3(0.3f, 0.4f, 0.62f));
+            Build.Sphere(handL, Vector3.zero, Vector3.one * 0.14f, skin);
+            Build.Sphere(handR, Vector3.zero, Vector3.one * 0.14f, skin);
+
+            lantern = Build.Empty("Lantern", cabin, new Vector3(-1.0f, 2.2f, 0.9f));
+
+            Build.Box(coach, new Vector3(-0.5f, 1.1f, 3.0f), new Vector3(0.08f, 0.08f, 3.6f), wood, new Vector3(-4f, 0, 0));
+            Build.Box(coach, new Vector3(0.5f, 1.1f, 3.0f), new Vector3(0.08f, 0.08f, 3.6f), wood, new Vector3(-4f, 0, 0));
+
+            // The model's wheels are part of the mesh; keep empty pivots so the spin code has something to turn.
+            for (int i = 0; i < 4; i++) wheels[i] = Build.Empty("Wheel" + i, coach, Vector3.zero);
+        }
+
+        // Where the driver sits on the modelled coach, and which way the mesh faces.
+        const float ModelYaw = 0f;
+        static readonly Vector3 DriverSeat = new Vector3(0f, 1.75f, 1.25f);
 
         void BuildReins()
         {
