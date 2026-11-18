@@ -17,7 +17,7 @@ namespace Reins
         public const float WalkSpeed = 4.5f;
         public const float TurnRate = 36f;          // deg/s at full single-rein pull
         public const float CoachGap = 4.3f;         // horse to coach axle
-        public const float FallMargin = 2.1f;       // how far past the edge before she goes over
+        public const float FallMargin = 2.4f;      // how far past the edge before she goes over
         public const int StartingWheels = 3;
 
         public Track Track;
@@ -115,7 +115,7 @@ namespace Reins
             Heading += wander * 9f * (0.5f + s01) * dt;
             // She will not willingly leave the road: on the verge she edges back in
             // unless the driver is hauling her the other way.
-            if (OnVerge) Heading -= Mathf.Sign(Lateral) * 24f * dt;
+            if (OnVerge) Heading -= Mathf.Sign(Lateral) * 60f * dt;
             Heading = roadAngle + Mathf.Clamp(Mathf.DeltaAngle(roadAngle, Heading), -55f, 55f);
 
             // Speed: slack reins let her run, both reins rein her in.
@@ -123,7 +123,7 @@ namespace Reins
             float target = Mathf.Lerp(Bolting ? MaxSpeed + 4f : MaxSpeed, WalkSpeed, brake);
             target *= 1f - 0.12f * Mathf.Abs(steer);
             if (OnVerge) target = Mathf.Min(target, 11f);
-            float rate = target > Speed ? (Bolting ? 9f : 2.6f) : Mathf.Lerp(4f, 12f, brake);
+            float rate = target > Speed ? (Bolting ? 9f : 2.6f) : Mathf.Lerp(OnVerge ? 12f : 4f, 12f, brake);
             Speed = Mathf.MoveTowards(Speed, target, rate * dt);
 
             Pos += Forward * Speed * dt;
