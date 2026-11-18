@@ -225,7 +225,6 @@ namespace Reins
                 case State.Delivered:
                     // She trots on into town by herself.
                     Rig.Invulnerable = true;
-                    Autopilot.Decide(Rig, Track, out bool dl, out bool dr);
                     Drive(true, true, dt);
                     if (confirm && StateTime > 1f) Restart(true);
                     break;

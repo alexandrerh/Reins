@@ -109,7 +109,6 @@ namespace Reins
 
         public void Chime(int streak)
         {
-            oneShots.pitch = 1f;
             // Walk up a pentatonic scale as the streak builds.
             float[] steps = { 0f, 2f, 4f, 7f, 9f, 12f, 14f, 16f };
             float semis = steps[Mathf.Min(streak, steps.Length - 1)];
