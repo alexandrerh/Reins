@@ -47,7 +47,10 @@ of short, light corrections, with the horse doing most of the work.
 - **The pinch** — in the back half the ridge narrows, right when the hazards get closer together.
 
 Reach the gatehouse at Holloway and you are ranked on letters delivered and the state of the coach.
-A clean run takes about a minute and a half.
+A clean run takes about a minute and a half. Your best delivery (most letters, time as the
+tie-break) is kept between sessions and shown on the title screen.
+
+![Result card](Docs/result.png)
 
 ![Coming into Holloway](Docs/holloway.png)
 
