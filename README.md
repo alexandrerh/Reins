@@ -56,7 +56,12 @@ tie-break) is kept between sessions and shown on the title screen.
 
 ## Running it
 
-Requires **Unity 6000.6.9f1** (Unity 6.6). No packages beyond the built-in modules.
+**Just want to play?** Download the Windows build from the
+[latest release](https://github.com/alexandrerh/Reins/releases/latest), extract it and run
+`Reins.exe`.
+
+To open the project you need **Unity 6000.6.9f1** (Unity 6.6). No packages beyond the built-in
+modules.
 
 1. Clone the repo and open the folder in Unity Hub.
 2. Open `Assets/Scenes/Main.unity` and press Play.
