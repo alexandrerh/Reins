@@ -249,7 +249,7 @@ namespace Reins
                     AddLetter(course, lz, ll);
                 }
 
-                z += Mathf.Lerp(R(30f, 42f), R(19f, 27f), progress);
+                z += Mathf.Lerp(R(34f, 46f), R(22f, 30f), progress);
             }
         }
 

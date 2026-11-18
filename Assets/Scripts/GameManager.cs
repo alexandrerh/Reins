@@ -43,7 +43,8 @@ namespace Reins
         // Capture mode (-autoshot <dir>): the autopilot plays and frames are saved for the README.
         string shotDir;
         int shotIndex;
-        static readonly float[] ShotTimes = { 1.5f, 13f, 22f, 33f };
+        bool resultShot;
+        static readonly float[] ShotTimes = { 9f, 21f, 40f, 62f, 84f, 96f };
 
         void Awake()
         {
@@ -205,8 +206,10 @@ namespace Reins
                     RunTime += dt;
                     if (capture)
                     {
+                        // Capture runs film the whole course, so the coach never takes its last knock.
                         Autopilot.Decide(Rig, Track, out bool cl, out bool cr);
                         Drive(cl, cr, dt);
+                        Rig.Wheels = Mathf.Max(Rig.Wheels, 1);
                     }
                     else
                     {
@@ -345,7 +348,7 @@ namespace Reins
             float rad = camYaw * Mathf.Deg2Rad;
             Vector3 back = new Vector3(Mathf.Sin(rad), 0f, Mathf.Cos(rad));
 
-            Vector3 anchor = Vector3.Lerp(Rig.Pos, Rig.CoachPos, 0.6f);
+            Vector3 anchor = Vector3.Lerp(Rig.Pos, Rig.CoachPos, Current == State.Title ? 0.6f : 0.45f);
             Vector3 pos, look;
             if (Current == State.Title)
             {
@@ -362,8 +365,9 @@ namespace Reins
             else
             {
                 float s = Rig.Speed01;
-                pos = anchor - back * Mathf.Lerp(8.5f, 10.5f, s) + Vector3.up * Mathf.Lerp(4.4f, 4.0f, s);
-                look = anchor + back * 9f + Vector3.up * 1.2f;
+                // High enough that the horse and both reins stay in view over the coach roof.
+                pos = anchor - back * Mathf.Lerp(10.5f, 11.5f, s) + Vector3.up * Mathf.Lerp(9f, 8.6f, s);
+                look = anchor + back * 5f + Vector3.up * 0.6f;
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, Mathf.Lerp(58f, 76f, s * s), 1f - Mathf.Exp(-3f * dt));
             }
 
@@ -378,27 +382,40 @@ namespace Reins
         void Capture()
         {
             if (shotDir == null) return;
-            float t = Time.timeSinceLevelLoad;
-            bool titleShot = Current == State.Title;
-            if (titleShot && shotIndex == 0 && t > ShotTimes[0])
+
+            if (Current == State.Title)
             {
-                ScreenCapture.CaptureScreenshot(Path.Combine(shotDir, "title.png"));
-                shotIndex = 1;
-                PlayerPrefs.SetInt("shot", 1);
+                if (shotIndex == 0 && StateTime > 1.5f)
+                {
+                    Shot("title");
+                    shotIndex = 1;
+                }
             }
-            else if (!titleShot)
+            else if (Current == State.Playing)
             {
-                if (shotIndex == 0) shotIndex = 1;
                 if (shotIndex < ShotTimes.Length && RunTime > ShotTimes[shotIndex])
                 {
-                    ScreenCapture.CaptureScreenshot(Path.Combine(shotDir, "run" + shotIndex + ".png"));
                     shotIndex++;
-                }
-                else if (shotIndex >= ShotTimes.Length && RunTime > ShotTimes[ShotTimes.Length - 1] + 1f)
-                {
-                    Application.Quit();
+                    Shot("run" + shotIndex);
                 }
             }
+            else
+            {
+                // Run over, however it ended: grab the result card and leave.
+                if (!resultShot && StateTime > 2.5f)
+                {
+                    Shot("result");
+                    resultShot = true;
+                    Debug.Log("Capture run ended: " + Current + ", letters " + Letters + "/" + LettersTotal +
+                              ", time " + RunTime.ToString("0.0") + "s, knocks left " + Rig.Wheels);
+                }
+                if (StateTime > 4f) Application.Quit();
+            }
+        }
+
+        void Shot(string name)
+        {
+            ScreenCapture.CaptureScreenshot(Path.Combine(shotDir, name + ".png"));
         }
     }
 }
